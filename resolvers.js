@@ -1,5 +1,6 @@
 const { User, Message } = require('./model');
 const mongoose = require('mongoose');
+const { signIn, signUp, signOut } = require('./controllers');
 
 mongoose.connect('mongodb://localhost:27017/graphql', {
     useNewUrlParser: true,
@@ -7,6 +8,7 @@ mongoose.connect('mongodb://localhost:27017/graphql', {
 });
 
 const resolvers = {
+    // Query, mutation to get data need authen middleware
     Query: {
         async getUser(parent, args, context, info) {
             return await User.findOne({ userName: args.userName });
@@ -49,6 +51,15 @@ const resolvers = {
             });
             console.log(message)
             return message
+        },
+        signIn: async (obj, { signInData }, { req }) => {
+            return await signIn(signInData, req);
+        },
+        signUp: async (obj, { signUpData }) => {
+            return await signUp(signUpData);
+        },
+        signOut: async (obj, args, { req }) => {
+            return await signOut(req);
         },
     },
     Subscription: {
