@@ -2,32 +2,24 @@ const { gql } = require('apollo-server');
 
 const typeDefs = gql`
   type Query {
-    getUser(userName: String!): User!
-    Users: [User]!
     hello(userName: String!): String!
   }
   type Mutation {
-    addUser(userName: String!, email: String!): User!
-    updateEmail(email: String!): User!
-    deleteUser(userName: String!): String!
-    addMessage(from: String!, to: String!, message: String!): Message!
-    
     signIn(signInData: signInData): SignInResponse
     signUp(signUpData: signUpData): DefaultResponse
     signOut: DefaultResponse
+    createMessage(messageData: messageData): DefaultResponse
   }
   type Subscription {
-    newMessage: Message!
-    newUser: User!
+    createMessage(toUser: String!): Message!
   }
-  input signInData {
-    userName: String!
-    password: String!
-  }
-  input signUpData {
-    email: String!
-    password: String!
-    userName: String!
+
+  #Data Type
+  type ChatMessage {
+    from: String!
+    to: String!
+    messageContent: String
+    time: String!
   }
   type SignInResponse{
     isSuccess: Boolean!
@@ -43,9 +35,24 @@ const typeDefs = gql`
     email: String!
   }
   type Message {
-    messageFrom: User!
-    messageTo: User!
+    messageFrom: String!
+    messageTo: String!
     message: String!
+  }
+  
+  #Input Data
+  input signInData {
+    userName: String!
+    password: String!
+  }
+  input signUpData {
+    email: String!
+    password: String!
+    userName: String!
+  }
+  input messageData {
+    toUser: String!
+    messageContent: String!
   }
 `;
 module.exports = typeDefs

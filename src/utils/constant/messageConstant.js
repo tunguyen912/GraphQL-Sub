@@ -1,0 +1,2 @@
+const NEW_MESSAGE_ADDED = 'NEW_MESSAGE_ADDED'
+module.exports = {NEW_MESSAGE_ADDED}
