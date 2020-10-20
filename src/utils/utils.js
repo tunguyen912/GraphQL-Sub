@@ -28,4 +28,11 @@ const defaultResponse = (isSuccess, message = null) => {
     }
 }
 
-module.exports = {hashPasswordAsync, comparePasswordAsync, signInResponse, genJWT, defaultResponse}
+const messageResponse = (isSuccess, message = null) => {
+    return{
+        isSuccess,
+        message
+    }
+}
+
+module.exports = {hashPasswordAsync, comparePasswordAsync, signInResponse, genJWT, defaultResponse, messageResponse}
