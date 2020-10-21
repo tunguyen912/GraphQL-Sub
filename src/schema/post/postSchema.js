@@ -1,47 +1,74 @@
-const { gql } = require('apollo-server');
-// const { signIn, signUp, signOut } = require('../../controllers/user/userControllers');
+const { gql, withFilter, PubSub } = require('apollo-server');
+const { createPost, likePostController } = require('../../controllers/post/postController');
+const { NEW_LIKE } = require('../../utils/constant/postConstant')
 
 
 const typeDefs = gql`
-  extend type Query {
-
-  }
   extend type Mutation {
-
+    createPost(postData: postData!): PostResponse!
+    likePost(postID: String!): Post!
   }
+  extend type Subscription {
+    likePost(owner: String!): Like!
+    #likePost(postID: String!): Post!
+  }
+  
 
   #Data Type
   type Post{
-    userName: String!
-    postContent: String!
-    likes: Number!
-    createTime: String!
+    user: String!
+    content: String!
+    like: Int!
+    time: String!
   }
-  
-  
+  type PostResponse{
+    isSuccess: Boolean!
+    message: String
+  }
+  type Like {
+    userLike: String!
+    postID: String!
+    owner: String!
+  }
   #Input Data
+  input postData{
+      postContent: String!
+  }
 `;
+
+const pubsub = new PubSub()
 const resolvers = {
-    Query: {
-        hello: (parent, { userName }) => {
-            return `Hello ${userName}`;
-        }
-    },
     Mutation: {
-        signIn: async (obj, { signInData }, { req }) => {
-            // console.log(req.headers.authorization)
-            return await signIn(signInData, req);
-        },
-        signUp: async (obj, { signUpData }) => {
-            return await signUp(signUpData);
-        },
-        signOut: async (obj, args, { req }) => {
-            return await signOut(req);
-        },
-        
+      createPost: async (obj, {postData}, {req} ) => {
+        let result = await createPost(postData, req)
+        return result
+      },
+      likePost: async (obj, {postID}, {req}) => {
+        let result = await likePostController(postID, req)
+        const payload = {
+          likePost: {
+            userLike: req.session.user.userName,
+            postID: postID,
+            owner: result.user
+          }
+        }
+        pubsub.publish(NEW_LIKE, payload);
+        return result
+      }
     },
+    Subscription: {
+      likePost: {
+        subscribe: withFilter(
+          () => pubsub.asyncIterator(NEW_LIKE),
+          (payload, variables) => {
+            // return payload.likePost.postID === variables.postID
+            return payload.likePost.owner === variables.owner
+          }
+        ) 
+      } 
+    }
 };
 module.exports = { 
-  userSchema: typeDefs, 
-  userResolvers: resolvers 
+  postSchema: typeDefs, 
+  postResolvers: resolvers 
 }

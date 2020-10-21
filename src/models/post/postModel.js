@@ -16,7 +16,8 @@ const postSchema = mongoose.Schema({
     like: {
         type: Number,
         default: 0
-    }
+    },
+    listOfLike: [String]
 });
 
 const PostModel = mongoose.model('posts', postSchema);

@@ -1,5 +1,5 @@
 const { MessageModel } = require('../../models/message/messageModel')
-const { messageResponse } = require('../../utils/utils');
+const { defaultResponse } = require('../../utils/utils');
 const { ERROR } = require('../../utils/constant/errorConstant')
 
 const createMessage = async (messageData, req) => {
@@ -11,7 +11,7 @@ const createMessage = async (messageData, req) => {
         message: messageContent
     })
     let result = await newMessageData.save();
-    if (result) return messageResponse( true, result.message )
+    if (result) return defaultResponse( true, result.message )
     throw new Error(ERROR);
 }
 module.exports = { createMessage }

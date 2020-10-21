@@ -28,11 +28,5 @@ const defaultResponse = (isSuccess, message = null) => {
     }
 }
 
-const messageResponse = (isSuccess, message = null) => {
-    return{
-        isSuccess,
-        message
-    }
-}
 
-module.exports = {hashPasswordAsync, comparePasswordAsync, signInResponse, genJWT, defaultResponse, messageResponse}
+module.exports = {hashPasswordAsync, comparePasswordAsync, signInResponse, genJWT, defaultResponse}

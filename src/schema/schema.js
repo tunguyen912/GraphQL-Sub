@@ -3,6 +3,7 @@ const { gql } = require('apollo-server-express');
 
 const { userSchema, userResolvers } = require('./users/userSchema')
 const { messageSchema, messageResolvers } = require('./message/messageSchema')
+const { postSchema, postResolvers } = require('./post/postSchema')
 
 const Query = gql`
     type Query {
@@ -26,11 +27,13 @@ const schema = makeExecutableSchema({
     Mutation,
     Subscription,
     userSchema,
-    messageSchema
+    messageSchema,
+    postSchema
   ],
   resolvers: [
     userResolvers,
-    messageResolvers
+    messageResolvers,
+    postResolvers
   ]
 })
 

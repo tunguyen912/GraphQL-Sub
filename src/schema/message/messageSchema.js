@@ -1,7 +1,6 @@
 const { createMessage } = require('../../controllers/message/messageController')
-const { gql } = require('apollo-server');
+const { gql, withFilter, PubSub } = require('apollo-server');
 const { NEW_MESSAGE_ADDED } = require('../../utils/constant/messageConstant')
-const { PubSub, withFilter } = require('apollo-server');
 
 const typeDefs = gql`
   
@@ -34,7 +33,6 @@ const pubsub = new PubSub()
 const resolvers = {
     Mutation: {
         createMessage: async (obj, {messageData}, {req} ) => {
-            // console.log(req.headers)
             let result = await createMessage(messageData, req)
             const payload = {
                 createMessage: {
@@ -46,16 +44,12 @@ const resolvers = {
             pubsub.publish(NEW_MESSAGE_ADDED, payload);
             return result
         }
-        
     },
     Subscription: {
         createMessage: {
             subscribe: withFilter(
-                () => {
-                    return pubsub.asyncIterator(NEW_MESSAGE_ADDED)
-                },
-                (payload, variables, context, info) => {
-                    console.log(context)
+                () => pubsub.asyncIterator(NEW_MESSAGE_ADDED),
+                (payload, variables) => {
                     return payload.createMessage.messageTo === variables.toUser
                 }
             ) 
