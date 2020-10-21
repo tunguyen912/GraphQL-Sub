@@ -9,8 +9,7 @@ const typeDefs = gql`
     createMessage(messageData: messageData): MessageResponse
   }
   extend type Subscription {
-    #createMessage(toUser: String!): Message!
-    createMessage(toUser: String!): Message!  
+    createMessage(toUser: String!): Message!
   }
 
   #Data Type
@@ -24,7 +23,6 @@ const typeDefs = gql`
     message: String!
   }
 
-  
   #Input Data
   input messageData {
     toUser: String!
@@ -36,6 +34,7 @@ const pubsub = new PubSub()
 const resolvers = {
     Mutation: {
         createMessage: async (obj, {messageData}, {req} ) => {
+            // console.log(req.headers)
             let result = await createMessage(messageData, req)
             const payload = {
                 createMessage: {
@@ -47,16 +46,19 @@ const resolvers = {
             pubsub.publish(NEW_MESSAGE_ADDED, payload);
             return result
         }
+        
     },
     Subscription: {
         createMessage: {
             subscribe: withFilter(
-                () => pubsub.asyncIterator(NEW_MESSAGE_ADDED),
-                (payload, variables) => {
+                () => {
+                    return pubsub.asyncIterator(NEW_MESSAGE_ADDED)
+                },
+                (payload, variables, context, info) => {
+                    console.log(context)
                     return payload.createMessage.messageTo === variables.toUser
                 }
-            )
-           
+            ) 
         }
     },
 };

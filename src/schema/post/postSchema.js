@@ -1,38 +1,25 @@
 const { gql } = require('apollo-server');
-const { signIn, signUp, signOut } = require('../../controllers/user/userControllers');
+// const { signIn, signUp, signOut } = require('../../controllers/user/userControllers');
 
 
 const typeDefs = gql`
   extend type Query {
-    hello(userName: String!): String!
+
   }
   extend type Mutation {
-    signIn(signInData: signInData): SignInResponse
-    signUp(signUpData: signUpData): DefaultResponse
-    signOut: DefaultResponse
+
   }
 
   #Data Type
-  type SignInResponse{
-    isSuccess: Boolean!
-    message: String
-    jwt: String
-  }
-  type DefaultResponse{
-    isSuccess: Boolean!
-    message: String
+  type Post{
+    userName: String!
+    postContent: String!
+    likes: Number!
+    createTime: String!
   }
   
+  
   #Input Data
-  input signInData {
-    userName: String!
-    password: String!
-  }
-  input signUpData {
-    email: String!
-    password: String!
-    userName: String!
-  }
 `;
 const resolvers = {
     Query: {
