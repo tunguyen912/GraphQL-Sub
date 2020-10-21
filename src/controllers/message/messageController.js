@@ -14,4 +14,7 @@ const createMessage = async (messageData, req) => {
     if (result) return defaultResponse( true, result.message )
     throw new Error(ERROR);
 }
-module.exports = { createMessage }
+const getMessageController = async ({userName}) => {
+    return await MessageModel.find({messageFrom: userName})
+}
+module.exports = { createMessage, getMessageController }

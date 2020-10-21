@@ -1,10 +1,11 @@
 const { gql } = require('apollo-server');
-const { signIn, signUp, signOut } = require('../../controllers/user/userControllers');
+const { signIn, signUp, signOut, getUserListController } = require('../../controllers/user/userControllers');
+const authorizationMiddleware = require('../../middlewares/authorizationMiddleware');
 
 
 const typeDefs = gql`
   extend type Query {
-    hello(userName: String!): String!
+    getUserList: [UserResponse]
   }
   extend type Mutation {
     signIn(signInData: signInData): SignInResponse
@@ -13,6 +14,10 @@ const typeDefs = gql`
   }
 
   #Data Type
+  type UserResponse {
+    userName: String!
+    email: String!
+  }
   type SignInResponse{
     isSuccess: Boolean!
     message: String
@@ -36,14 +41,14 @@ const typeDefs = gql`
 `;
 const resolvers = {
     Query: {
-        hello: (parent, { userName }) => {
-            return `Hello ${userName}`;
-        }
+        getUserList: async (_, __, context) => {
+          let result = await authorizationMiddleware(context, getUserListController)
+          return result
+        },
     },
     Mutation: {
         signIn: async (obj, { signInData }, { req }) => {
-            // console.log(req.headers.authorization)
-            return await signIn(signInData, req);
+          return await signIn(signInData, req);
         },
         signUp: async (obj, { signUpData }) => {
             return await signUp(signUpData);

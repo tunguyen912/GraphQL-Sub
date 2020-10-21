@@ -21,11 +21,15 @@ const likePostController = async (postID, req) => {
     let result = await PostModel.findOneAndUpdate(
         { _id: _postID }, 
         { 
-            $inc: { like: 1 } , 
-            $push: {listOfLike : req.session.user.userName},
+            $inc: { like: 1 }, 
+            $addToSet: {listOfLike: req.session.user.userName},
         }
     );
-    if(result) return result
+    if(result) return result;
     throw new Error(ERROR);    
 }
-module.exports = { createPost, likePostController }
+
+const getPostController = async ({userName}) => {
+    return await PostModel.find({user: userName})
+}
+module.exports = { createPost, likePostController, getPostController }

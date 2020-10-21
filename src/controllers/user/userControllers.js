@@ -1,6 +1,6 @@
 const { UserModel } = require('../../models/user/userModel');
 const { hashPasswordAsync, comparePasswordAsync, genJWT, signInResponse, defaultResponse } = require('../../utils/utils');
-const {DUPLICATE_ERROR, SIGN_UP_ERROR, INCORRECT_PASSWORD, INCORRECT_USERNAME, ERROR} = require('../../utils/constant/errorConstant')
+const {DUPLICATE_ERROR, SIGN_UP_ERROR, INCORRECT_PASSWORD, INCORRECT_USERNAME} = require('../../utils/constant/errorConstant')
  
 const signUp = async (signUpdata) => {
     try {
@@ -44,4 +44,8 @@ const signOut = async (req) => {
     await req.session.destroy();
     return defaultResponse(true)
 }
-module.exports = { signUp, signIn, signOut }
+
+const getUserListController = async () => {
+    return await UserModel.find({})
+}
+module.exports = { signUp, signIn, signOut, getUserListController }

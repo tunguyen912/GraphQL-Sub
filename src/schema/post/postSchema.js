@@ -1,18 +1,19 @@
 const { gql, withFilter, PubSub } = require('apollo-server');
-const { createPost, likePostController } = require('../../controllers/post/postController');
+const { createPost, likePostController, getPostController } = require('../../controllers/post/postController');
 const { NEW_LIKE } = require('../../utils/constant/postConstant')
-
+const authorizationMiddleware = require('../../middlewares/authorizationMiddleware');
 
 const typeDefs = gql`
+  extend type Query {
+    getPost: [Post]
+  }
   extend type Mutation {
     createPost(postData: postData!): PostResponse!
     likePost(postID: String!): Post!
   }
   extend type Subscription {
     likePost(owner: String!): Like!
-    #likePost(postID: String!): Post!
   }
-  
 
   #Data Type
   type Post{
@@ -38,6 +39,12 @@ const typeDefs = gql`
 
 const pubsub = new PubSub()
 const resolvers = {
+    Query: {
+      getPost: async (_, __, context) => {
+        let result = await authorizationMiddleware(context, getPostController)
+        return result
+      },
+    },
     Mutation: {
       createPost: async (obj, {postData}, {req} ) => {
         let result = await createPost(postData, req)
@@ -53,6 +60,7 @@ const resolvers = {
           }
         }
         pubsub.publish(NEW_LIKE, payload);
+        console.log(result)
         return result
       }
     },
@@ -61,7 +69,6 @@ const resolvers = {
         subscribe: withFilter(
           () => pubsub.asyncIterator(NEW_LIKE),
           (payload, variables) => {
-            // return payload.likePost.postID === variables.postID
             return payload.likePost.owner === variables.owner
           }
         ) 

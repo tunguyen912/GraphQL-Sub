@@ -1,7 +1,4 @@
 const mongoose = require('mongoose');
-const mongoConnect = require('connect-mongo');
-const session = require('express-session');
-const MongoStore = mongoConnect(session);
 
 
 let mongoSession;
@@ -11,6 +8,5 @@ const connect = async () => {
         useUnifiedTopology: true,
         useFindAndModify: false
     });
-    // console.log(mongoSession);
 }
 module.exports = { connect, mongoSession,mongoose };

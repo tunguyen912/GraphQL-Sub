@@ -1,9 +1,12 @@
-const { createMessage } = require('../../controllers/message/messageController')
+const { createMessage, getMessageController } = require('../../controllers/message/messageController')
 const { gql, withFilter, PubSub } = require('apollo-server');
 const { NEW_MESSAGE_ADDED } = require('../../utils/constant/messageConstant')
+const authorizationMiddleware = require('../../middlewares/authorizationMiddleware');
 
 const typeDefs = gql`
-  
+  extend type Query {
+    getMessageHistory: [Message]
+  }
   extend type Mutation {
     createMessage(messageData: messageData): MessageResponse
   }
@@ -31,6 +34,12 @@ const typeDefs = gql`
 
 const pubsub = new PubSub()
 const resolvers = {
+    Query: {
+      getMessageHistory: async (_, __, context) => {
+        let result = await authorizationMiddleware(context, getMessageController)
+        return result
+      },
+    },
     Mutation: {
         createMessage: async (obj, {messageData}, {req} ) => {
             let result = await createMessage(messageData, req)

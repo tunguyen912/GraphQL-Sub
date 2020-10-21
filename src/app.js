@@ -2,7 +2,6 @@ const express = require('express')
 const session = require('express-session');
 const mongoConnect = require('connect-mongo');
 require('dotenv').config()
-// const { connect, mongoose} = require('./config/mongoConnect')
 
 const app = express();
 
